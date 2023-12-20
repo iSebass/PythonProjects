@@ -5,7 +5,7 @@ import random
 
 #Creamos el lienzo donde vamos a trabajar
 pygame.font.init()
-WIDTH, HEIGHT = 800,900
+WIDTH, HEIGHT = 700,700
 window = pygame.display.set_mode( (WIDTH, HEIGHT) )
 pygame.display.set_caption('INVADERS SPACE')
 
@@ -90,7 +90,7 @@ def main():
 
     main_font = pygame.font.SysFont("comicsans", 30)
     
-    player = Player(300,650)
+    player = Player(WIDTH//2, HEIGHT//2+100)
 
     
     
