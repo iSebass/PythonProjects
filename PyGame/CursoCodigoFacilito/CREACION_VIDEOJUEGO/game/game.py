@@ -21,16 +21,23 @@ class Game:
         self.surface = pygame.display.set_mode(  (WIDTH, HEIGHT) )
         pygame.display.set_caption(TITLE)
         self.runing  = True
-        self.playing = True
+       
 
         self.dir        = os.path.dirname(__file__)
         self.dir_sounds = os.path.join(self.dir, 'sources/Sounds')
 
+        self.font = pygame.font.match_font(FONT)
+
+        self.clock = pygame.time.Clock()
+
     def start(self):
+        self.menu()
         self.new()
 
     def new(self):
+        self.playing = True
         self.score = 0
+        self.lvl = 0
         self.generate_elements()
         self.run()
 
@@ -47,9 +54,9 @@ class Game:
         self.sprites.add(self.player)
 
         self.generate_walls()
-        self.generate_coin()
+        
 
-        self.clock = pygame.time.Clock()
+        
 
     def generate_coin(self):
         last_position = WIDTH+100
@@ -62,7 +69,7 @@ class Game:
 
                 self.sprites.add(coin)
                 self.Coins.add(coin)
-            
+        
     def generate_walls(self):
 
         last_position = WIDTH+100
@@ -77,13 +84,15 @@ class Game:
                 self.sprites.add(wall)
                 self.walls.add(wall)
 
+            self.lvl +=1
+            self.generate_coin()
 
     def run(self):
         while self.runing:
             self.clock.tick(FPS)
             self.events()
-            self.draw()
             self.update()
+            self.draw()
 
     def events(self):
         for event in pygame.event.get():
@@ -94,16 +103,34 @@ class Game:
         key = pygame.key.get_pressed()
         if key[pygame.K_SPACE]:
             self.player.jump()
+        
+        if key[pygame.K_r] and not self.playing:
+            self.new()
 
     def draw(self):
         self.surface.fill(BLACK)
+        self.draw_text()
+    
         self.sprites.draw(self.surface)
+        pygame.display.flip()
+
+    def draw_text(self):
+        self.display_text( "Score: "+str(self.score), 36, WHITE, WIDTH//2, TEXT_POS_Y)
+        self.display_text( "Nivel: "+str(self.lvl), 36, WHITE, WIDTH//10, TEXT_POS_Y)
+        if not self.playing:
+             self.display_text( "Perdiste !!", 60, WHITE, WIDTH//2, HEIGHT//2)
+             self.display_text( "Press R to Reload", 35, WHITE, WIDTH//2, 100)
+
+    def display_text(self, text, size, color, posx, posy):
+        font = pygame.font.Font(self.font, size)
+        text = font.render(text, True, color)
+        rect = text.get_rect()
+        rect.midtop = (posx, posy)
+
+        self.surface.blit(text, rect)
 
     def update(self):
         if self.playing:
-            pygame.display.flip()
-            
-
             wall = self.player.collide_with(self.walls)
             if wall:
                 if self.player.collide_bottom(wall):
@@ -127,8 +154,6 @@ class Game:
             self.update_elements(self.Coins)
             self.generate_walls()
 
-           
-
     def update_elements(self, elements):
         for element in elements:
             if not element.rect.right>0:
@@ -144,5 +169,24 @@ class Game:
     def stop_elements(self, elements):
         for element in elements:
             element.stop()
+
+    def menu(self):
+        self.surface.fill(GREEN_LIGHT)
+        self.display_text('Presiona Una tecla para comenzar',36, BLACK, WIDTH//2, 10)
+        pygame.display.flip()
+        self.wait()
+
+    def wait(self):
+        wait = True
+        while wait:
+            self.clock.tick(FPS)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    wait = False
+                    self.runing = False
+                    pygame.quit()
+                if event.type == pygame.KEYUP:
+                    wait = False
 
     
