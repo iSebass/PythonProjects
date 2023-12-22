@@ -6,4 +6,4 @@ def main():
     iSebasGame.start()
 
 if __name__ == '__main__':
-    main()
+    main()                                                                 
